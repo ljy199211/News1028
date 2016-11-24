@@ -1,13 +1,14 @@
 package com.example.administrator.news1028.entity;
 
-import java.util.List;
+import java.io.Serializable;
+import java.util.ArrayList;
 
 /**
  * Created by ${ljy} on 2016/10/21.
  */
 
-public class GsonNews {
-    private List<Ab> ads;
+public class GsonNews implements Serializable{
+    private ArrayList<Ab> ads;
     private String alias;
     private String boardid;
     private String cid;
@@ -19,7 +20,7 @@ public class GsonNews {
     private int hasHead;
     private boolean hasIcon;
     private int hasImg;
-    private List<Imge> imgextra;
+    private ArrayList<Imge> imgextra;
     private String imgsrc;
     private int imgsum;
     private String lmodify;
@@ -37,7 +38,7 @@ public class GsonNews {
     private String tname;
     private int votecount;
 
-    public GsonNews(List<Ab> ads, String alias, String boardid, String cid, String digest, String docid, String ename, int hasAD, boolean hasCover, int hasHead, boolean hasIcon, int hasImg, List<Imge> imgextra, String imgsrc, int imgsum, String lmodify, int order, String photosetID, String postid, int priority, String ptime, int replyCount, String skipID, String skipType, String source, String template, String title, String tname, int votecount) {
+    public GsonNews(ArrayList<Ab> ads, String alias, String boardid, String cid, String digest, String docid, String ename, int hasAD, boolean hasCover, int hasHead, boolean hasIcon, int hasImg, ArrayList<Imge> imgextra, String imgsrc, int imgsum, String lmodify, int order, String photosetID, String postid, int priority, String ptime, int replyCount, String skipID, String skipType, String source, String template, String title, String tname, int votecount) {
         this.ads = ads;
         this.alias = alias;
         this.boardid = boardid;
@@ -69,11 +70,11 @@ public class GsonNews {
         this.votecount = votecount;
     }
 
-    public List<Ab> getAds() {
+    public ArrayList<Ab> getAds() {
         return ads;
     }
 
-    public void setAds(List<Ab> ads) {
+    public void setAds(ArrayList<Ab> ads) {
         this.ads = ads;
     }
 
@@ -165,11 +166,11 @@ public class GsonNews {
         this.hasImg = hasImg;
     }
 
-    public List<Imge> getImgextra() {
+    public ArrayList<Imge> getImgextra() {
         return imgextra;
     }
 
-    public void setImgextra(List<Imge> imgextra) {
+    public void setImgextra(ArrayList<Imge> imgextra) {
         this.imgextra = imgextra;
     }
 
@@ -336,7 +337,7 @@ public class GsonNews {
                 '}';
     }
 
-    public static class Ab {
+    public static class Ab implements Serializable{
         private String docid;
         private String imgsrc;
         private String subtitle;
@@ -414,7 +415,7 @@ public class GsonNews {
         }
     }
 
-    public class Imge {
+    public class Imge implements Serializable{
         private String imgsrc;
 
         public Imge(String imgsrc) {

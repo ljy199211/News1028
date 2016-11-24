@@ -1,17 +1,17 @@
 package com.example.administrator.news1028.fragment;
 
 import android.content.Context;
-import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.Nullable;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 
 import com.example.administrator.news1028.R;
 import com.example.administrator.news1028.adapter.NetneaseAdapter;
-import com.example.administrator.news1028.base.BaseFragment;
+import com.example.administrator.news1028.base.LazyBaseFragment;
 import com.example.administrator.news1028.biz.Xhttp;
 import com.example.administrator.news1028.common.NewsUrl;
 import com.example.administrator.news1028.entity.GsonNews;
@@ -26,7 +26,7 @@ import butterknife.BindView;
  * Created by ${ljy} on 2016/10/28.
  */
 
-public class NewsListFragment extends BaseFragment implements SwipeRefreshLayout.OnRefreshListener, NetneaseAdapter.OnItemClickListener {
+public class NewsListFragment extends LazyBaseFragment implements SwipeRefreshLayout.OnRefreshListener, NetneaseAdapter.OnItemClickListener {
     private static final String KEY_TID = "key_tid";
     private static final String KEY_TNAME = "key_tname";
     @BindView(R.id.recyclerView)
@@ -52,17 +52,28 @@ public class NewsListFragment extends BaseFragment implements SwipeRefreshLayout
         Xhttp.getNewsList(NewsUrl.getUrl(tid), tid, listener);
     }
 
+    @Override
+    protected boolean lazyLoad() {
+        Log.d(TAG, "lazyLoad: 加载数据");
+        //        mTvText.setText(tid + "------" + tname);
+        swipe1.setOnRefreshListener(this);
+        recyclerView.addOnScrollListener(lis);
+        Xhttp.getNewsList(NewsUrl.getUrl(tid), tid, listener);
+        // Xhttp.getNewsList(url, "T1370583240249", listener);
+        return true;
+    }
+
     private Xhttp.OnSuccessListener listener = new Xhttp.OnSuccessListener() {
         @Override
         public void setNewsList(List<GsonNews> newsList) {
             adapter = new NetneaseAdapter(newsList);
-
+            adapter.setListener(NewsListFragment.this);
             recyclerView.setAdapter(adapter);
             adapter.notifyDataSetChanged();
             layoutManager = new LinearLayoutManager(getContext());
             recyclerView.setLayoutManager(layoutManager);
             recyclerView.addItemDecoration(new RecycleViewDivider(getContext(), LinearLayoutManager.HORIZONTAL));
-            adapter.setListener(NewsListFragment.this);
+
         }
     };
 
@@ -91,11 +102,6 @@ public class NewsListFragment extends BaseFragment implements SwipeRefreshLayout
         mHandler = new Handler();
     }
 
-    public void onButtonPressed(Uri uri) {
-        if (mListener != null) {
-            mListener.onFragmentInteraction(uri);
-        }
-    }
 
     private RecyclerView.OnScrollListener lis = new RecyclerView.OnScrollListener() {
         @Override
@@ -168,11 +174,24 @@ public class NewsListFragment extends BaseFragment implements SwipeRefreshLayout
 
     @Override
     public void onItemClick(int position) {
-
+        //onButtonPressed(adapter.getGsonNewses().get(position).getDocid());
+        onButtonPressed(adapter.getGsonNewses().get(position));
     }
 
 
+   /* public void onButtonPressed(String docid) {
+        if (mListener != null) {
+            mListener.onFragmentInteraction(docid);
+        }
+    }*/
+   public void onButtonPressed(GsonNews gsonNews) {
+        if (mListener != null) {
+            mListener.onFragmentInteraction(gsonNews);
+        }
+    }
+
     public interface OnFragmentInteractionListener {
-        void onFragmentInteraction(Uri uri);
+        //void onFragmentInteraction(String docId);
+        void onFragmentInteraction(GsonNews gsonNews);
     }
 }

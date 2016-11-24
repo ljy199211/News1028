@@ -4,10 +4,12 @@ import android.util.Log;
 
 import com.example.administrator.news1028.common.NewsUrl;
 import com.example.administrator.news1028.entity.GsonNews;
+import com.example.administrator.news1028.entity.NewsDetails;
 import com.example.administrator.news1028.entity.NewsType;
 import com.google.gson.Gson;
 
 import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
 import org.xutils.common.Callback;
 import org.xutils.http.RequestParams;
@@ -67,7 +69,9 @@ public class Xhttp {
             }
         };
         x.http().get(entity,callback);
+
     }
+
     public interface OnSuccessListener{
         void setNewsList(List<GsonNews> newsList);
     }
@@ -110,4 +114,65 @@ public class Xhttp {
         void onSuccess(NewsType newsType);
         void onFinished();
     }
+
+    public static void getNewsDetailsList(final String docId, final OnNewsContentListener listener){
+        RequestParams entity = new RequestParams(NewsUrl.getContentUrl(docId));
+
+        Callback.CommonCallback<String> callback = new Callback.CommonCallback<String>() {
+            @Override
+            public void onSuccess(String result) {
+                Log.d("解析结果", "getNewsDetailsList: "+result);
+                try {
+                    JSONObject obj = new JSONObject(result);
+                    String string = obj.getString(docId);
+                    Gson gson = new Gson();
+                    NewsDetails newsDetails = gson.fromJson(string, NewsDetails.class);
+
+                    //从newsContent对象中把body和img集合重新整合一个让webview显示的string
+
+                    String before = "<p><img src=\"";
+                    String after = "\"/> </img></p>";
+                    //重整字符串：
+                    //1.添加标题；<p><h1>  </h1></p>
+                    String title_b = "<p><h2>";
+                    String title_a = "</h2></p>";
+
+                    newsDetails.body = title_b + newsDetails.title + title_a + newsDetails.body;
+                    //添加作者：
+                    for (NewsDetails.Img img : newsDetails.img) {
+                        newsDetails.body = newsDetails.body.replace(img.ref, before + img.src + after);
+                    }
+
+                    //字符串交给webview
+                    if (listener != null) {
+                        listener.onFinish(newsDetails.body);
+                    }
+
+
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                    Log.d(TAG, "onSuccess解析异常: " + e.getMessage());
+                }
+            }
+
+            @Override
+            public void onError(Throwable ex, boolean isOnCallback) {
+
+            }
+
+            @Override
+            public void onCancelled(CancelledException cex) {
+
+            }
+
+            @Override
+            public void onFinished() {
+
+            }
+        };
+        x.http().get(entity,callback);
+    }
+public interface OnNewsContentListener{
+    void onFinish(String str);
+}
 }
